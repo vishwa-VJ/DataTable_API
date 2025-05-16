@@ -1,5 +1,4 @@
 package com.example.DataTabledb.model;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,7 +14,7 @@ public class DataInfo {
 
     private String name;
     private String email;
-    private int contactNo;
+    private String contactNo;
     private LocalDate dob;
     private String workType;
 
@@ -43,11 +42,11 @@ public class DataInfo {
         this.email = email;
     }
 
-    public int getContactNo() {
+    public String  getContactNo() {
         return contactNo;
     }
 
-    public void setContactNo(int contactNo) {
+    public void setContactNo(String contactNo) {
         this.contactNo = contactNo;
     }
 
