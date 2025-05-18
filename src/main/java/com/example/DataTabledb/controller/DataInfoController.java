@@ -10,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/datas")
+@CrossOrigin(origins = "http://localhost:3000")
 public class DataInfoController {
 
     @Autowired

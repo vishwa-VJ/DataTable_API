@@ -1,42 +1,56 @@
 package com.example.DataTabledb.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 public class SecurityConfig {
 
-    @Autowired
-    private JwtAuthFilter jwtAuthFilter;
+    private final JwtAuthFilter jwtAuthFilter;
 
+    public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
+        this.jwtAuthFilter = jwtAuthFilter;
+    }
+
+    // 🔐 Chain 1: For /auth endpoints (public access)
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
+    @Order(1)
+    public SecurityFilterChain authChain(HttpSecurity http) throws Exception {
+        return http
+                .securityMatcher("/auth/**")
                 .csrf(csrf -> csrf.disable())
+                .cors(cors -> {}) // enable CORS
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+                .build();
+    }
+
+    // 🔐 Chain 2: For all other endpoints (JWT secured)
+    @Bean
+    @Order(2)
+    public SecurityFilterChain apiChain(HttpSecurity http) throws Exception {
+        return http
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> {})
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll()           // Allow signup/login
+                        .requestMatchers(HttpMethod.GET, "/datas/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/datas/**").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/datas/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/datas/**").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/datas/**").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-
-        return http.build();
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
 
     @Bean
@@ -49,3 +63,4 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 }
+

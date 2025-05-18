@@ -25,6 +25,6 @@ public class AuthController {
         String email = body.get("email");
         String password = body.get("password");
         String token = authService.login(email, password);
-        return Map.of("token", token);
+        return Map.of("token", token,"email",email);
     }
 }
