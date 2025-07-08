@@ -2,7 +2,6 @@ package com.example.DataTabledb.service;
 
 import com.example.DataTabledb.repository.UserRepository;
 import com.example.DataTabledb.model.User;
-import com.example.DataTabledb.repository.UserRepository;
 import com.example.DataTabledb.security.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
